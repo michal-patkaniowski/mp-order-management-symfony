@@ -54,7 +54,14 @@
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "status": "paid",
-  "items": [...],
+  "items": [
+    {
+      "productId": "123",
+      "productName": "Sample Product",
+      "price": 2999,
+      "quantity": 2
+    }
+  ],
   "total": 5998,
   "createdAt": "2023-11-15T10:30:00Z"
 }
@@ -69,6 +76,14 @@
 ```json
 {
   "status": "shipped"
+}
+```
+
+**Success response (200 OK)**:
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "shipped",
 }
 ```
 
