@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Order\Entity;
 
 use DateTimeInterface;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Order\Entity\OrderStatus;
 
 #[ORM\Entity]
+#[ORM\Table(name: '`order_table`')]
 class Order
 {
     public const GROUP_GENERAL = 'order_general';
-    public const GROUP_DETAILS = 'order_details';
+    public const GROUP_ITEMS = 'order_items';
 
     private const VALID_STATUSES = ['new', 'paid', 'shipped', 'cancelled'];
 
@@ -37,9 +37,12 @@ class Order
     private string $status;
 
     #[ORM\OneToMany(mappedBy: "order", targetEntity: OrderItem::class, cascade: ["persist", "remove"])]
-    #[Assert\Valid(groups: [self::GROUP_DETAILS])]
-    #[Groups([self::GROUP_DETAILS])]
-    private Collection $items;
+    #[Assert\Valid(groups: [self::GROUP_ITEMS])]
+    #[Groups([self::GROUP_ITEMS])]
+    /**
+     * @var OrderItem[]
+     */
+    private array $items;
 
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank(groups: [self::GROUP_GENERAL])]
@@ -80,12 +83,12 @@ class Order
         return $this;
     }
 
-    public function getItems(): Collection
+    public function getItems(): array
     {
         return $this->items;
     }
 
-    public function setItems(Collection $items): self
+    public function setItems(array $items): self
     {
         $this->items = $items;
         return $this;

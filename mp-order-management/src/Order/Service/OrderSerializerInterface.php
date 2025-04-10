@@ -10,5 +10,5 @@ interface OrderSerializerInterface
 {
     public function serialize(Order $order, array $groups): string;
 
-    public function deserialize(array $data, array $groups): Order;
+    public function denormalize(array $data, array $groups): object;
 }

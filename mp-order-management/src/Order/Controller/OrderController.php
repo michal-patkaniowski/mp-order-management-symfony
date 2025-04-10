@@ -11,8 +11,6 @@ use App\Order\Service\OrderGuardInterface;
 use App\Order\Service\OrderSerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -39,12 +37,14 @@ class OrderController extends AbstractController
     #[Route('/{uuid}', name: 'get', methods: ['GET'])]
     public function getOrderAction(string $uuid): Response
     {
+        $this->orderGuard->ensureUuidIsValid($uuid);
+
         $order = $this->orderRepository->find($uuid);
         $this->orderGuard->ensureExists($order);
 
         return new Response($this->orderSerializer->serialize(
             $order,
-            [Order::GROUP_GENERAL, Order::GROUP_DETAILS]
+            [Order::GROUP_GENERAL, Order::GROUP_ITEMS]
         ));
     }
 
@@ -55,7 +55,7 @@ class OrderController extends AbstractController
 
         return new Response($this->orderSerializer->serialize(
             $order,
-            [Order::GROUP_GENERAL, Order::GROUP_DETAILS]
+            [Order::GROUP_GENERAL, Order::GROUP_ITEMS]
         ), Response::HTTP_CREATED);
     }
 }

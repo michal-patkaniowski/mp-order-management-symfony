@@ -21,8 +21,8 @@ class OrderSerializer implements OrderSerializerInterface
         return $this->serializer->serialize($order, 'json', ['groups' => $groups]);
     }
 
-    public function deserialize(array $data, array $groups = []): Order
+    public function denormalize(array $data, array $groups = []): Order
     {
-        return $this->serializer->deserialize($data, Order::class, 'json', ['groups' => $groups]);
+        return $this->serializer->denormalize($data, Order::class, 'json', ['groups' => $groups]);
     }
 }

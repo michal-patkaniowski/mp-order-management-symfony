@@ -13,30 +13,30 @@ class OrderItem
 {
     #[ORM\Id]
     #[ORM\Column(type: "uuid")]
-    #[Assert\NotBlank(groups: [Order::GROUP_DETAILS])]
-    #[Groups([Order::GROUP_DETAILS])]
+    #[Assert\NotBlank(groups: [Order::GROUP_ITEMS])]
+    #[Groups([Order::GROUP_ITEMS])]
     private string $id;
 
     #[ORM\Column(type: "string")]
-    #[Assert\NotBlank(groups: [Order::GROUP_DETAILS])]
-    #[Groups([Order::GROUP_DETAILS])]
+    #[Assert\NotBlank(groups: [Order::GROUP_ITEMS])]
+    #[Groups([Order::GROUP_ITEMS])]
     private string $productId;
 
     #[ORM\Column(type: "string")]
-    #[Assert\NotBlank(groups: [Order::GROUP_DETAILS])]
-    #[Groups([Order::GROUP_DETAILS])]
+    #[Assert\NotBlank(groups: [Order::GROUP_ITEMS])]
+    #[Groups([Order::GROUP_ITEMS])]
     private string $productName;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(groups: [Order::GROUP_DETAILS])]
-    #[Assert\Positive(groups: [Order::GROUP_DETAILS])]
-    #[Groups([Order::GROUP_DETAILS])]
+    #[Assert\NotBlank(groups: [Order::GROUP_ITEMS])]
+    #[Assert\Positive(groups: [Order::GROUP_ITEMS])]
+    #[Groups([Order::GROUP_ITEMS])]
     private int $price;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(groups: [Order::GROUP_DETAILS])]
-    #[Assert\Positive(groups: [Order::GROUP_DETAILS])]
-    #[Groups([Order::GROUP_DETAILS])]
+    #[Assert\NotBlank(groups: [Order::GROUP_ITEMS])]
+    #[Assert\Positive(groups: [Order::GROUP_ITEMS])]
+    #[Groups([Order::GROUP_ITEMS])]
     private int $quantity;
 
     #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: "items")]

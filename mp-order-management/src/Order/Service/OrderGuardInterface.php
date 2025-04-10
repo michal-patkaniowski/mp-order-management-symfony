@@ -8,5 +8,7 @@ use App\Order\Entity\Order;
 
 interface OrderGuardInterface
 {
-    public function ensureExists(Order $order): void;
+    public function ensureExists(?Order $order): void;
+
+    public function ensureUuidIsValid(string $uuid): void;
 }

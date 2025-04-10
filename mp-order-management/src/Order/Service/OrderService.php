@@ -9,6 +9,7 @@ use App\Order\Factory\OrderFactoryInterface;
 use App\Order\Repository\OrderRepositoryInterface;
 use App\Order\Service\OrderSerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use InvalidArgumentException;
 
 class OrderService implements OrderServiceInterface
 {
@@ -22,7 +23,7 @@ class OrderService implements OrderServiceInterface
 
     public function createNewOrder(array $data): Order
     {
-        $orderData = $this->orderSerializer->deserialize($data, [Order::GROUP_GENERAL, Order::GROUP_DETAILS]);
+        $orderData = $this->orderSerializer->denormalize($data, [Order::GROUP_GENERAL, Order::GROUP_ITEMS]);
         $order = $this->orderFactory->create($orderData);
         $this->validateOrder($order);
 
@@ -33,7 +34,7 @@ class OrderService implements OrderServiceInterface
 
     public function validateOrder(Order $order): bool
     {
-        $violations = $this->validator->validate($order, null, [Order::GROUP_GENERAL, Order::GROUP_DETAILS]);
+        $violations = $this->validator->validate($order, null, [Order::GROUP_GENERAL, Order::GROUP_ITEMS]);
 
         //TODO simplify - return array of string messages, use array fn
         if ($violations->count() > 0) {
@@ -41,7 +42,7 @@ class OrderService implements OrderServiceInterface
             foreach ($violations as $violation) {
                 $errors[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
             }
-            throw new \InvalidArgumentException(implode(', ', $errors));
+            throw new InvalidArgumentException(implode(', ', $errors));
         }
 
         return true;
