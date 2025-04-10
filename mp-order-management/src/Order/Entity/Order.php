@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Order\Entity\OrderStatus;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 #[ORM\Table(name: '`order_table`')]
@@ -16,8 +17,6 @@ class Order
 {
     public const GROUP_GENERAL = 'order_general';
     public const GROUP_ITEMS = 'order_items';
-
-    private const VALID_STATUSES = ['new', 'paid', 'shipped', 'cancelled'];
 
     #[ORM\Id]
     #[ORM\Column(type: "uuid")]
@@ -32,17 +31,16 @@ class Order
 
     #[ORM\Column(type: "string", enumType: OrderStatus::class)]
     #[Assert\NotBlank(groups: [self::GROUP_GENERAL])]
-    #[Assert\Choice(choices: self::VALID_STATUSES, groups: [self::GROUP_GENERAL])]
     #[Groups([self::GROUP_GENERAL])]
-    private string $status;
+    private OrderStatus $status;
 
     #[ORM\OneToMany(mappedBy: "order", targetEntity: OrderItem::class, cascade: ["persist", "remove"])]
     #[Assert\Valid(groups: [self::GROUP_ITEMS])]
     #[Groups([self::GROUP_ITEMS])]
     /**
-     * @var OrderItem[]
+    * @var Collection|OrderItem[]
      */
-    private array $items;
+    private Collection|array $items;
 
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank(groups: [self::GROUP_GENERAL])]
@@ -72,23 +70,23 @@ class Order
         return $this;
     }
 
-    public function getStatus(): string
+    public function getStatus(): OrderStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): self
+    public function setStatus(OrderStatus $status): self
     {
         $this->status = $status;
         return $this;
     }
 
-    public function getItems(): array
+    public function getItems(): Collection|array
     {
         return $this->items;
     }
 
-    public function setItems(array $items): self
+    public function setItems(Collection|array $items): self
     {
         $this->items = $items;
         return $this;
@@ -96,12 +94,16 @@ class Order
 
     public function getTotal(): int
     {
+        $this->updateTotal();
         return $this->total;
     }
 
-    public function setTotal(int $total): self
+    public function updateTotal(): void
     {
-        $this->total = $total;
-        return $this;
+        $this->total = array_reduce(
+            $this->items instanceof Collection ? $this->items->toArray() : $this->items,
+            static fn($carry, OrderItem $item): int => $carry + $item->getPrice() * $item->getQuantity(),
+            0
+        );
     }
 }

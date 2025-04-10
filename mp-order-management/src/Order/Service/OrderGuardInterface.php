@@ -11,4 +11,8 @@ interface OrderGuardInterface
     public function ensureExists(?Order $order): void;
 
     public function ensureUuidIsValid(string $uuid): void;
+
+    public function getValidationErrors(Order $order): array;
+
+    public function ensureIsValid(Order $order): void;
 }

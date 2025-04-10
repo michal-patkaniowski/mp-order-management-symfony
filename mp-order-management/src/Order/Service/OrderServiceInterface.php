@@ -9,6 +9,4 @@ use App\Order\Entity\Order;
 interface OrderServiceInterface
 {
     public function createNewOrder(array $data): Order;
-
-    public function validateOrder(Order $order): bool;
 }
