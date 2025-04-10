@@ -91,6 +91,15 @@
 
 ## INSTALLATION INSTRUCTIONS:
 
+### Prerequisites
+Ensure the following extensions are enabled in your `php.ini` configuration file:
+
+```ini
+extension=pdo_sqlite
+extension=sqlite3
+sqlite3.extension_dir=ext
+```
+
 ### Clone repository:
 ```bash
 git clone https://github.com/michal-patkaniowski/mp-order-management-symfony.git
