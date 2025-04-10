@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Order\Controller;
 
 use App\Order\Entity\Order;
-use App\Order\Repository\OrderRepositoryInterface;
 use App\Order\Service\OrderServiceInterface;
 use App\Order\Service\OrderGuardInterface;
 use App\Order\Service\OrderSerializerInterface;
@@ -17,21 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/orders', name: 'order_')]
 class OrderController extends AbstractController
 {
-    private OrderSerializerInterface $orderSerializer;
-    private OrderRepositoryInterface $orderRepository;
-    private OrderServiceInterface $orderService;
-    private OrderGuardInterface $orderGuard;
-
     public function __construct(
-        OrderSerializerInterface $orderSerializer,
-        OrderRepositoryInterface $orderRepository,
-        OrderServiceInterface $orderService,
-        OrderGuardInterface $orderGuard
+        private OrderSerializerInterface $orderSerializer,
+        private OrderServiceInterface $orderService,
+        private OrderGuardInterface $orderGuard
     ) {
-        $this->orderSerializer = $orderSerializer;
-        $this->orderRepository = $orderRepository;
-        $this->orderService = $orderService;
-        $this->orderGuard = $orderGuard;
     }
 
     #[Route('/{uuid}', name: 'get', methods: ['GET'])]
@@ -39,8 +28,7 @@ class OrderController extends AbstractController
     {
         $this->orderGuard->ensureUuidIsValid($uuid);
 
-        $order = $this->orderRepository->find($uuid);
-        $this->orderGuard->ensureExists($order);
+        $order = $this->orderService->findOrder($uuid);
 
         return new Response($this->orderSerializer->serialize(
             $order,
@@ -64,10 +52,10 @@ class OrderController extends AbstractController
     {
         $this->orderGuard->ensureUuidIsValid($uuid);
 
-        $order = $this->orderRepository->find($uuid);
-        $this->orderGuard->ensureExists($order);
+        $order = $this->orderService->findOrder($uuid);
 
-        $newStatus = $request->get('status');
+        $newStatus = $request->toArray()['status'] ?? null;
+
         $this->orderService->changeOrderStatus($order, $newStatus);
 
         return new Response($this->orderSerializer->serialize(

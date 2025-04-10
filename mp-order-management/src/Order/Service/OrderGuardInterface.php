@@ -16,5 +16,5 @@ interface OrderGuardInterface
 
     public function ensureIsValid(Order $order): void;
 
-    public function ensureNewStatusIsValid(Order $order, string $newStatus): void;
+    public function ensureNewStatusIsValid(Order $order, ?string $newStatus): void;
 }

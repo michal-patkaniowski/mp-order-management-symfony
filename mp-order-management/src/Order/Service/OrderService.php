@@ -22,6 +22,14 @@ class OrderService implements OrderServiceInterface
     ) {
     }
 
+    public function findOrder(string $uuid): Order
+    {
+        $order = $this->orderRepository->find($uuid);
+        $this->orderGuard->ensureExists($order);
+
+        return $order;
+    }
+
     public function createNewOrder(array $data): Order
     {
         $orderData = $this->orderSerializer->denormalize($data, [Order::GROUP_GENERAL, Order::GROUP_ITEMS]);
@@ -33,7 +41,7 @@ class OrderService implements OrderServiceInterface
         return $order;
     }
 
-    public function changeOrderStatus(Order $order, string $newStatus): void
+    public function changeOrderStatus(Order $order, ?string $newStatus): void
     {
         $this->orderGuard->ensureNewStatusIsValid($order, $newStatus);
 

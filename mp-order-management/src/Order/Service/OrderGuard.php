@@ -52,8 +52,12 @@ class OrderGuard implements OrderGuardInterface
         }
     }
 
-    public function ensureNewStatusIsValid(Order $order, string $newStatus): void
+    public function ensureNewStatusIsValid(Order $order, ?string $newStatus): void
     {
+        if ($newStatus === null) {
+            throw new InvalidArgumentException('New status cannot be null.');
+        }
+
         $status = OrderStatus::tryFrom($newStatus);
 
         if ($status === null) {
