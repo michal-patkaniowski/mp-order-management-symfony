@@ -93,8 +93,7 @@
 
 ### Clone repository:
 ```bash
-git clone https://github.com/your-repo/order-system.git
-cd order-system
+git clone https://github.com/michal-patkaniowski/mp-order-management-symfony.git
 ```
 
 ### Install dependencies:
@@ -110,7 +109,7 @@ php bin/console doctrine:migrations:migrate
 
 ### Run test suite:
 ```bash
-php bin/phpunit
+php vendor/bin/phpunit
 ```
 
 ### Start development server:
