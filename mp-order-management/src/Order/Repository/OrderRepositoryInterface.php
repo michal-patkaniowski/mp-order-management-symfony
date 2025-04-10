@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Repository;
+namespace App\Order\Repository;
 
-use App\Entity\Order;
+use App\Order\Entity\Order;
 
 interface OrderRepositoryInterface
 {

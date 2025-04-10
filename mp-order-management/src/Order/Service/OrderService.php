@@ -2,39 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Order\Service;
 
-use App\Entity\Order;
-use App\Repository\OrderRepositoryInterface;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Uid\Uuid;
-use App\Service\OrderServiceInterface;
-use App\Factory\OrderFactoryInterface;
+use App\Order\Entity\Order;
+use App\Order\Factory\OrderFactoryInterface;
+use App\Order\Repository\OrderRepositoryInterface;
+use App\Order\Service\OrderSerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class OrderService implements OrderServiceInterface
 {
-    private OrderRepositoryInterface $orderRepository;
-    private OrderFactoryInterface $orderFactory;
-    private SerializerInterface $serializer;
-    private ValidatorInterface $validator;
-
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        OrderFactoryInterface $orderFactory,
-        SerializerInterface $serializer,
-        ValidatorInterface $validator
+        private OrderRepositoryInterface $orderRepository,
+        private OrderFactoryInterface $orderFactory,
+        private OrderSerializerInterface $orderSerializer,
+        private ValidatorInterface $validator
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->orderFactory = $orderFactory;
-        $this->serializer = $serializer;
-        $this->validator = $validator;
     }
 
     public function createNewOrder(array $data): Order
     {
-        $orderData = $this->serializer->denormalize($data, Order::class, 'json');
+        $orderData = $this->orderSerializer->deserialize($data, [Order::GROUP_GENERAL, Order::GROUP_DETAILS]);
         $order = $this->orderFactory->create($orderData);
         $this->validateOrder($order);
 

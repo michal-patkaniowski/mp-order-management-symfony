@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Order\Service;
 
-use App\Entity\Order;
+use App\Order\Entity\Order;
 
 interface OrderServiceInterface
 {

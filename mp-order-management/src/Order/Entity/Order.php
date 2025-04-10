@@ -2,19 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Order\Entity;
 
 use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Order\Entity\OrderStatus;
 
 #[ORM\Entity]
 class Order
 {
     public const GROUP_GENERAL = 'order_general';
     public const GROUP_DETAILS = 'order_details';
+
+    private const VALID_STATUSES = ['new', 'paid', 'shipped', 'cancelled'];
 
     #[ORM\Id]
     #[ORM\Column(type: "uuid")]
@@ -29,7 +32,7 @@ class Order
 
     #[ORM\Column(type: "string", enumType: OrderStatus::class)]
     #[Assert\NotBlank(groups: [self::GROUP_GENERAL])]
-    #[Assert\Choice(choices: OrderStatus::cases(), groups: [self::GROUP_GENERAL])]
+    #[Assert\Choice(choices: self::VALID_STATUSES, groups: [self::GROUP_GENERAL])]
     #[Groups([self::GROUP_GENERAL])]
     private string $status;
 

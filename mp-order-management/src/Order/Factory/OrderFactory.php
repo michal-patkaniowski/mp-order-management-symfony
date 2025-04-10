@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Factory;
+namespace App\Order\Factory;
 
-use App\Entity\Order;
+use App\Order\Entity\Order;
 use Symfony\Component\Uid\Uuid;
 
 class OrderFactory implements OrderFactoryInterface
 {
-    public function create(array $data): Order
+    public function create(Order $data): Order
     {
         $order = new Order();
 
