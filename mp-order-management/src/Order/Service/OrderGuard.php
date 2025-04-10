@@ -67,7 +67,7 @@ class OrderGuard implements OrderGuardInterface
         $clonedOrder = clone $order;
         $clonedOrder->setStatus($status);
 
-        $violations = $this->validator->validate($clonedOrder, null, [StatusTransition::class]);
+        $violations = $this->validator->validate($clonedOrder, new StatusTransition());
 
         if (count($violations) > 0) {
             $errors = [];

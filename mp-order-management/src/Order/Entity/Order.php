@@ -35,7 +35,7 @@ class Order
     #[Groups([self::GROUP_GENERAL, self::GROUP_STATUS])]
     private OrderStatus $status;
 
-    private OrderStatus $previousStatus;
+    private ?OrderStatus $previousStatus = null;
 
     #[ORM\OneToMany(mappedBy: "order", targetEntity: OrderItem::class, cascade: ["persist", "remove"])]
     #[Assert\Valid(groups: [self::GROUP_ITEMS])]
@@ -80,15 +80,12 @@ class Order
 
     public function setStatus(OrderStatus $status): self
     {
-        if ($this->status === $status) {
-            return $this;
-        }
         $this->previousStatus = $this->status;
         $this->status = $status;
         return $this;
     }
 
-    public function getPreviousStatus(): OrderStatus
+    public function getPreviousStatus(): ?OrderStatus
     {
         return $this->previousStatus;
     }

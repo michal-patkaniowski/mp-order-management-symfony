@@ -12,6 +12,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class StatusTransitionValidator extends ConstraintValidator
 {
+    private const PERMITTED_STATUS_TRANSITIONS = [
+        OrderStatus::NEW->value => [OrderStatus::PAID->value, OrderStatus::CANCELLED->value],
+        OrderStatus::PAID->value => [OrderStatus::NEW->value, OrderStatus::SHIPPED->value],
+        OrderStatus::SHIPPED->value => [], // cannot transition to any status
+        OrderStatus::CANCELLED->value => [OrderStatus::NEW->value],
+    ];
+
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof StatusTransition) {
@@ -25,28 +32,30 @@ class StatusTransitionValidator extends ConstraintValidator
         $currentStatus = $value->getStatus();
         $previousStatus = $value->getPreviousStatus();
 
-        $statusTransitions = [
-            OrderStatus::NEW => null, // can transition to any status
-            OrderStatus::PAID => [OrderStatus::NEW , OrderStatus::SHIPPED],
-            OrderStatus::SHIPPED => [], // cannot transition to any status
-            OrderStatus::CANCELLED => [OrderStatus::NEW],
-        ];
+        if ($previousStatus === null) {
+            return;
+        }
 
-        if (!array_key_exists($currentStatus->value, $statusTransitions)) {
+        if ($previousStatus === $currentStatus) {
+            $this->context->buildViolation('Order status has not changed.')
+                ->addViolation();
+            return;
+        }
+
+        if (!array_key_exists($previousStatus->value, self::PERMITTED_STATUS_TRANSITIONS)) {
             $this->context->buildViolation('Order status is not valid for this operation.')
                 ->addViolation();
             return;
         }
 
-        $allowedStatuses = $statusTransitions[$currentStatus->value] ?? null;
+        $allowedStatuses = self::PERMITTED_STATUS_TRANSITIONS[$previousStatus->value] ?? null;
 
         if (
-            $allowedStatuses !== null && $previousStatus !== null &&
-            !in_array($previousStatus->value, $allowedStatuses, true)
+            $allowedStatuses !== null && !in_array($currentStatus->value, $allowedStatuses, true)
         ) {
             $this->context->buildViolation(sprintf(
-                'Order with status "%s" can only transition from: %s.',
-                $currentStatus,
+                'Order with status "%s" can only transition to: %s.',
+                $previousStatus->value,
                 implode(', ', $allowedStatuses)
             ))->addViolation();
         }
