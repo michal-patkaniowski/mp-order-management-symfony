@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Order\Service;
 
-use InvalidArgumentException;
 use App\Order\Entity\Order;
+use App\Order\Entity\OrderStatus;
+use App\Order\Validator\StatusTransition;
+use InvalidArgumentException;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -46,6 +48,29 @@ class OrderGuard implements OrderGuardInterface
         $errors = $this->getValidationErrors($order);
 
         if (!empty($errors)) {
+            throw new InvalidArgumentException(implode(', ', $errors));
+        }
+    }
+
+    public function ensureNewStatusIsValid(Order $order, string $newStatus): void
+    {
+        $status = OrderStatus::tryFrom($newStatus);
+
+        if ($status === null) {
+            throw new InvalidArgumentException(sprintf('Invalid status: %s', $newStatus));
+        }
+
+        $clonedOrder = clone $order;
+        $clonedOrder->setStatus($status);
+
+        $violations = $this->validator->validate($clonedOrder, null, [StatusTransition::class]);
+
+        if (count($violations) > 0) {
+            $errors = [];
+            foreach ($violations as $violation) {
+                $errors[] = $violation->getMessage();
+            }
+
             throw new InvalidArgumentException(implode(', ', $errors));
         }
     }

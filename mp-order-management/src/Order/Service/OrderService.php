@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Order\Service;
 
 use App\Order\Entity\Order;
+use App\Order\Entity\OrderStatus;
 use App\Order\Factory\OrderFactoryInterface;
 use App\Order\Repository\OrderRepositoryInterface;
 use App\Order\Service\OrderSerializerInterface;
 use App\Order\Service\OrderGuardInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use InvalidArgumentException;
 
 class OrderService implements OrderServiceInterface
@@ -31,5 +31,15 @@ class OrderService implements OrderServiceInterface
         $this->orderRepository->create($order);
 
         return $order;
+    }
+
+    public function changeOrderStatus(Order $order, string $newStatus): void
+    {
+        $this->orderGuard->ensureNewStatusIsValid($order, $newStatus);
+
+        $status = OrderStatus::from($newStatus);
+        $order->setStatus($status);
+
+        $this->orderRepository->create($order);
     }
 }

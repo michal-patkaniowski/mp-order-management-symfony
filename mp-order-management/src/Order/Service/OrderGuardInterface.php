@@ -15,4 +15,6 @@ interface OrderGuardInterface
     public function getValidationErrors(Order $order): array;
 
     public function ensureIsValid(Order $order): void;
+
+    public function ensureNewStatusIsValid(Order $order, string $newStatus): void;
 }

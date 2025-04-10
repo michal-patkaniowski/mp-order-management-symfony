@@ -58,4 +58,21 @@ class OrderController extends AbstractController
             [Order::GROUP_GENERAL, Order::GROUP_ITEMS]
         ), Response::HTTP_CREATED);
     }
+
+    #[Route('/{uuid}', name: 'patch_status', methods: ['PATCH'])]
+    public function patchOrderStatusAction(string $uuid, Request $request): Response
+    {
+        $this->orderGuard->ensureUuidIsValid($uuid);
+
+        $order = $this->orderRepository->find($uuid);
+        $this->orderGuard->ensureExists($order);
+
+        $newStatus = $request->get('status');
+        $this->orderService->changeOrderStatus($order, $newStatus);
+
+        return new Response($this->orderSerializer->serialize(
+            $order,
+            [Order::GROUP_STATUS]
+        ));
+    }
 }

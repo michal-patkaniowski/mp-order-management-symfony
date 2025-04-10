@@ -17,11 +17,12 @@ class Order
 {
     public const GROUP_GENERAL = 'order_general';
     public const GROUP_ITEMS = 'order_items';
+    public const GROUP_STATUS = 'order_status';
 
     #[ORM\Id]
     #[ORM\Column(type: "uuid")]
     #[Assert\NotBlank(groups: [self::GROUP_GENERAL])]
-    #[Groups([self::GROUP_GENERAL])]
+    #[Groups([self::GROUP_GENERAL, self::GROUP_STATUS])]
     private string $id;
 
     #[ORM\Column(type: "datetime")]
@@ -31,8 +32,10 @@ class Order
 
     #[ORM\Column(type: "string", enumType: OrderStatus::class)]
     #[Assert\NotBlank(groups: [self::GROUP_GENERAL])]
-    #[Groups([self::GROUP_GENERAL])]
+    #[Groups([self::GROUP_GENERAL, self::GROUP_STATUS])]
     private OrderStatus $status;
+
+    private OrderStatus $previousStatus;
 
     #[ORM\OneToMany(mappedBy: "order", targetEntity: OrderItem::class, cascade: ["persist", "remove"])]
     #[Assert\Valid(groups: [self::GROUP_ITEMS])]
@@ -77,8 +80,17 @@ class Order
 
     public function setStatus(OrderStatus $status): self
     {
+        if ($this->status === $status) {
+            return $this;
+        }
+        $this->previousStatus = $this->status;
         $this->status = $status;
         return $this;
+    }
+
+    public function getPreviousStatus(): OrderStatus
+    {
+        return $this->previousStatus;
     }
 
     public function getItems(): Collection|array
