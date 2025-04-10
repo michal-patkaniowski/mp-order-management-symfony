@@ -80,7 +80,7 @@ class Order
 
     public function setStatus(OrderStatus $status): self
     {
-        $this->previousStatus = $this->status;
+        $this->previousStatus = $this->status ?? null;
         $this->status = $status;
         return $this;
     }
